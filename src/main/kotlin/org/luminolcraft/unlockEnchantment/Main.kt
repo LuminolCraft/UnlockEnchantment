@@ -1,11 +1,12 @@
 package org.luminolcraft.unlockEnchantment
 
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
 class Main : JavaPlugin() {
 
     override fun onEnable() {
-        // Plugin startup logic
+        Bukkit.getPluginManager().registerEvents(AnvilListener(), this)
     }
 
     override fun onDisable() {
