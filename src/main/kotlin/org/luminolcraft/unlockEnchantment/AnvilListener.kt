@@ -6,7 +6,6 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.enchantment.PrepareItemEnchantEvent
 import org.bukkit.event.inventory.PrepareAnvilEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
@@ -20,7 +19,7 @@ class AnvilListener : Listener {
         val firstItem: ItemStack? = event.inventory.firstItem
         val secondItem: ItemStack? = event.inventory.secondItem
 //        println("If no more log,bugs.Stage 1")
-        if (firstItem!!.isEmpty == true || event.inventory.secondItem!!.isEmpty) return
+        if (firstItem!!.isEmpty || event.inventory.secondItem!!.isEmpty || !Main.configManager.isPluginEnabled) return
 //        println("If no more log,bugs.Stage 2")
 //        val firstItemEnchants: Map<Enchantment?, Int?>?
 //        firstItemEnchants = if (event.inventory.firstItem?.type == Material.ENCHANTED_BOOK
@@ -94,7 +93,8 @@ class AnvilListener : Listener {
                                 Tag.ITEMS_CHEST_ARMOR.isTagged(firstItem.type) ||
                                 Tag.ITEMS_FOOT_ARMOR.isTagged(firstItem.type) ||
                                 Tag.ITEMS_LEG_ARMOR.isTagged(firstItem.type) ||
-                                Tag.ITEMS_HEAD_ARMOR.isTagged(firstItem.type)) && secondItem?.type == Material.ENCHANTED_BOOK
+                                Tag.ITEMS_HEAD_ARMOR.isTagged(firstItem.type)) && secondItem?.type == Material.ENCHANTED_BOOK &&
+                        Main.configManager.isEnchantmentSimplify
                     ) {
                         if (firstItemEnchants[s.key]!! < s.value!!) {
                             itemEnchants[s.key] = s.value
@@ -119,9 +119,8 @@ class AnvilListener : Listener {
                 itemEnchants[s.key] = s.value
             }
         }
-        //TODO Add configuration to adjust this value
-        if(event.view.repairCost >= 717){
-            event.view.repairCost = 717
+        if (event.view.repairCost >= Main.configManager.maximumLevelCost && Main.configManager.maximumLevelCost != -1) {
+            event.view.repairCost = Main.configManager.maximumLevelCost
         }
 
         for (e in itemEnchants) {

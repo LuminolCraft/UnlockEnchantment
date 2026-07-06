@@ -26,7 +26,7 @@ class ConfigManager(config: FileConfiguration) {
                 config.set("simplify-enchantment", true)
                 config.setComments("simplify-enchantment", listOf("Set whether to simplify the enchantment"))
             }
-            if (config.get("maximum-level-cost") == null) {
+            if (config.get("maximum-level-cost") == null || config.getInt("maximum-level-cost") < -1) {
                 config.set("maximum-level-cost", -1)
                 config.setComments(
                     "maximum-level-cost",
@@ -77,17 +77,5 @@ class ConfigManager(config: FileConfiguration) {
         initConfig()
         config.load(configFile)
         loadConfig()
-    }
-    fun getIsPluginEnabled(): Boolean {
-        return isPluginEnabled
-    }
-    fun getIsEnchantmentSimplify(): Boolean {
-        return isEnchantmentSimplify
-    }
-    fun getMaximumLevelCost(): Int {
-        return maximumLevelCost
-    }
-    fun getBlacklist(): List<String> {
-        return blacklist
     }
 }
