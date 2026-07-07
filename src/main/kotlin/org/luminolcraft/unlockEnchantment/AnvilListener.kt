@@ -9,6 +9,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.PrepareAnvilEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
+import kotlin.let
 
 class AnvilListener : Listener {
 
@@ -131,8 +132,10 @@ class AnvilListener : Listener {
 
         for (e in itemEnchants) {
             e.let {
-                if (Main.configManager.specialEnchantments.containsKey(it.key) ||
-                    e.value!! > Main.configManager.specialEnchantments[it.key]!!.maximumLevels
+                if (Main.configManager.specialEnchantments != null && Main.configManager.specialEnchantments.containsKey(
+                        it.key
+                    ) ||
+                    Main.configManager.specialEnchantments[it.key]?.maximumLevels?.let { it1 -> e.value!! > it1 } == true
                 ) {
                     itemEnchants[it.key] = Main.configManager.specialEnchantments[it.key]!!.maximumLevels
                 }

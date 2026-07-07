@@ -8,7 +8,7 @@ import org.luminolcraft.unlockEnchantment.config.ConfigManager
 class Main : JavaPlugin() {
 
     override fun onEnable() {
-        configManager = ConfigManager(config)
+        configManager = ConfigManager(config, this)
         configManager.loadConfig()
         Bukkit.getPluginManager().registerEvents(AnvilListener(), this)
         logger.info("Loaded")

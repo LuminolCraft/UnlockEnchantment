@@ -8,10 +8,11 @@ import org.bukkit.NamespacedKey
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
-class ConfigManager(val config: FileConfiguration) {
-    val configFile: File = File(config.currentPath)
+class ConfigManager(val config: FileConfiguration, javaPlugin: JavaPlugin) {
+    val configFile: File = File(javaPlugin.dataFolder, "config.yml")
 
     var isPluginEnabled: Boolean = false
     var isEnchantmentSimplify: Boolean = false
@@ -22,8 +23,9 @@ class ConfigManager(val config: FileConfiguration) {
 
     private fun initConfig() {
         if (!configFile.exists()) {
-            configFile.mkdirs()
+            configFile.parentFile.mkdirs()
             configFile.createNewFile()
+        }
             config.load(configFile)
             if (config.get("enabled") == null) {
                 config.set("enabled", true)
@@ -68,7 +70,7 @@ class ConfigManager(val config: FileConfiguration) {
                 )
             }
             config.save(configFile)
-        }
+
     }
 
     fun loadConfig() {
