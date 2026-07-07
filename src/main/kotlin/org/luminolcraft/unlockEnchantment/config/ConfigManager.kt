@@ -1,7 +1,11 @@
 package org.luminolcraft.unlockEnchantment.config
 
 import com.google.common.collect.Lists
+import io.papermc.paper.registry.RegistryAccess
+import io.papermc.paper.registry.RegistryKey
+import org.bukkit.NamespacedKey
 import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.enchantments.Enchantment
 import java.io.File
 
 class ConfigManager(config: FileConfiguration) {
@@ -11,7 +15,8 @@ class ConfigManager(config: FileConfiguration) {
     var isPluginEnabled: Boolean = false
     var isEnchantmentSimplify:Boolean = false
     var maximumLevelCost: Int = -1
-    var blacklist: List<String> = Lists.newArrayList()
+    private var blacklistStr: List<String> = Lists.newArrayList()
+    var blackListEnchantments: MutableList<Enchantment?> = Lists.newArrayList()
 
     fun initConfig() {
         if (!configFile.exists()) {
@@ -70,12 +75,19 @@ class ConfigManager(config: FileConfiguration) {
         isPluginEnabled = config.getBoolean("enabled", true)
         isEnchantmentSimplify = config.getBoolean("simplify-enchantment", true)
         maximumLevelCost = config.getInt("maximum-level-cost", -1)
-        blacklist = config.getStringList("blacklist")
+        blacklistStr = config.getStringList("blacklist")
+        blacklistStr.forEach {
+            blackListEnchantments.add(getEnchantmentFromString(it))
+        }
     }
 
     fun reloadConfig() {
         initConfig()
         config.load(configFile)
         loadConfig()
+    }
+
+    fun getEnchantmentFromString(str: String): Enchantment? {
+        return RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(NamespacedKey.minecraft(str))
     }
 }

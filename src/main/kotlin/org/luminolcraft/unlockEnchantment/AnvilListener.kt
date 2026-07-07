@@ -62,6 +62,10 @@ class AnvilListener : Listener {
 //        println("If no more log,bugs.Stage 4")
         if (secondItemEnchants != null) {
             for (s in secondItemEnchants) {
+                if(Main.configManager.blackListEnchantments.contains(s.key)) {
+                    itemEnchants[s.key] = s.value
+                    continue
+                }
                 //            println("Run into FOR1.")
                 if (s.key?.maxLevel == 1) {
                     //                println("Run into IF1.")
