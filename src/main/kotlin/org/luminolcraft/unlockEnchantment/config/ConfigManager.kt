@@ -20,7 +20,7 @@ class ConfigManager(val config: FileConfiguration) {
     var blackListEnchantments: MutableList<Enchantment?> = Lists.newArrayList()
     var specialEnchantments: MutableMap<Enchantment, SpecialEnchantments> = Maps.newHashMap()
 
-    fun initConfig() {
+    private fun initConfig() {
         if (!configFile.exists()) {
             configFile.mkdirs()
             configFile.createNewFile()

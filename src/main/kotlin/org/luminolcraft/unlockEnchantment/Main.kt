@@ -9,6 +9,7 @@ class Main : JavaPlugin() {
 
     override fun onEnable() {
         configManager = ConfigManager(config)
+        configManager.loadConfig()
         Bukkit.getPluginManager().registerEvents(AnvilListener(), this)
         logger.info("Loaded")
     }
