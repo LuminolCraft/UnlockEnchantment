@@ -16,6 +16,7 @@ class Main : JavaPlugin() {
     override fun onDisable() {
         // Plugin shutdown logic
     }
+
     companion object {
         lateinit var configManager: ConfigManager
     }

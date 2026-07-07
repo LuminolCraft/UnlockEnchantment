@@ -1,22 +1,24 @@
 package org.luminolcraft.unlockEnchantment.config
 
 import com.google.common.collect.Lists
+import com.google.common.collect.Maps
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import org.bukkit.NamespacedKey
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.enchantments.Enchantment
 import java.io.File
 
-class ConfigManager(config: FileConfiguration) {
-    val config: FileConfiguration = config
+class ConfigManager(val config: FileConfiguration) {
     val configFile: File = File(config.currentPath)
 
     var isPluginEnabled: Boolean = false
-    var isEnchantmentSimplify:Boolean = false
+    var isEnchantmentSimplify: Boolean = false
     var maximumLevelCost: Int = -1
     private var blacklistStr: List<String> = Lists.newArrayList()
     var blackListEnchantments: MutableList<Enchantment?> = Lists.newArrayList()
+    var specialEnchantments: MutableMap<Enchantment, SpecialEnchantments> = Maps.newHashMap()
 
     fun initConfig() {
         if (!configFile.exists()) {
@@ -61,7 +63,6 @@ class ConfigManager(config: FileConfiguration) {
                         "Example:",
                         "special-enchantment-setting:",
                         "  SHARPNESS:",
-                        "    maximum-level-cost: 114",
                         "    maximum-level: 5"
                     )
                 )
@@ -79,6 +80,20 @@ class ConfigManager(config: FileConfiguration) {
         blacklistStr.forEach {
             blackListEnchantments.add(getEnchantmentFromString(it))
         }
+        val specialEnchantmentsSection: ConfigurationSection? =
+            config.getConfigurationSection("special-enchantment-setting")
+        if (specialEnchantmentsSection != null) {
+            var enchant: Enchantment
+            var maximumLevels: Int
+            for (str in specialEnchantmentsSection.getKeys(false)) {
+                if (getEnchantmentFromString(str) == null ||
+                    specialEnchantmentsSection.get("$str.maximum-level") == null
+                ) continue
+                enchant = getEnchantmentFromString(str)!!
+                maximumLevels = specialEnchantmentsSection.getInt("$str.maximum-level")
+                specialEnchantments[enchant] = (SpecialEnchantments(enchant, maximumLevels))
+            }
+        }
     }
 
     fun reloadConfig() {
@@ -91,3 +106,5 @@ class ConfigManager(config: FileConfiguration) {
         return RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(NamespacedKey.minecraft(str))
     }
 }
+
+class SpecialEnchantments(val enchant: Enchantment, val maximumLevels: Int)

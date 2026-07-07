@@ -62,7 +62,7 @@ class AnvilListener : Listener {
 //        println("If no more log,bugs.Stage 4")
         if (secondItemEnchants != null) {
             for (s in secondItemEnchants) {
-                if(Main.configManager.blackListEnchantments.contains(s.key)) {
+                if (Main.configManager.blackListEnchantments.contains(s.key)) {
                     itemEnchants[s.key] = s.value
                     continue
                 }
@@ -97,7 +97,7 @@ class AnvilListener : Listener {
                                 Tag.ITEMS_CHEST_ARMOR.isTagged(firstItem.type) ||
                                 Tag.ITEMS_FOOT_ARMOR.isTagged(firstItem.type) ||
                                 Tag.ITEMS_LEG_ARMOR.isTagged(firstItem.type) ||
-                                Tag.ITEMS_HEAD_ARMOR.isTagged(firstItem.type)) && secondItem?.type == Material.ENCHANTED_BOOK &&
+                                Tag.ITEMS_HEAD_ARMOR.isTagged(firstItem.type)) && secondItem.type == Material.ENCHANTED_BOOK &&
                         Main.configManager.isEnchantmentSimplify
                     ) {
                         if (firstItemEnchants[s.key]!! < s.value!!) {
@@ -123,13 +123,20 @@ class AnvilListener : Listener {
                 itemEnchants[s.key] = s.value
             }
         }
+
+        //最大花费 总体
         if (event.view.repairCost >= Main.configManager.maximumLevelCost && Main.configManager.maximumLevelCost != -1) {
             event.view.repairCost = Main.configManager.maximumLevelCost
         }
 
         for (e in itemEnchants) {
-            e.key?.let {
-                result.addUnsafeEnchantment(it, e.value!!)
+            e.let {
+                if (Main.configManager.specialEnchantments.containsKey(it.key) ||
+                    e.value!! > Main.configManager.specialEnchantments[it.key]!!.maximumLevels
+                ) {
+                    itemEnchants[it.key] = Main.configManager.specialEnchantments[it.key]!!.maximumLevels
+                }
+                result.addUnsafeEnchantment(it.key!!, itemEnchants[it.key]!!)
             }
         }
 //        println("All functions passed.")
