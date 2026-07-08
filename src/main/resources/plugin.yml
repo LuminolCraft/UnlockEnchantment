@@ -1,7 +1,31 @@
+# ============================================================================
+#  UnlockEnchantment 插件描述文件 (plugin.yml)
+# ============================================================================
+#  这是 Bukkit/Paper/Folia 服务端识别插件的标准描述文件。
+#  服务端启动时会读取本文件，获取插件名称、主类、API 版本等元信息。
+#  注意：本文件中的 ${version} 占位符会在构建时被 build.gradle.kts 的
+#        processResources 任务替换为实际版本号。
+# ============================================================================
+
+# 插件名称：必须与 plugins 目录下的文件夹名一致
 name: UnlockEnchantment
+
+# 插件版本号：构建时由 build.gradle.kts 的 processResources 注入
+# （源码中写作 '${version}'，打包后会被替换成 gradle.properties 里的 version 值）
 version: '${version}'
 
+# 主类全限定名：服务端通过反射实例化此类，作为插件入口
+# 格式为 包路径.类名，对应 src/main/kotlin 下的源文件
 main: org.luminolcraft.unlockEnchantment.Main
+
+# API 版本：声明本插件所针对的 Paper/Folia API 版本
+# 服务端会据此进行兼容性校验，版本不匹配时会拒绝加载
 api-version: '26.1.2'
+
+# 加载时机：POSTWORLD 表示在所有世界加载完成后再加载本插件
+# （另一可选值 STARTUP 表示服务端启动时即加载，那时世界尚未就绪）
 load: POSTWORLD
+
+# 声明本插件支持 Folia（Paper 的多线程服务端分支）
+# 设为 true 后，Folia 服务端才会允许本插件运行；需确保插件代码线程安全
 folia-supported: true

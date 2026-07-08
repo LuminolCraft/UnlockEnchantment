@@ -19,3 +19,6 @@ hs_err_pid*
 
 # Common working directory
 run
+.trae/specs/add-detailed-comments-and-bilingual-docs/checklist.md
+.trae/specs/add-detailed-comments-and-bilingual-docs/spec.md
+.trae/specs/add-detailed-comments-and-bilingual-docs/tasks.md
