@@ -29,12 +29,13 @@ class CraftListener : Listener {
         if (!Main.configManager.isEnchantmentSimplify || event.inventory !is CraftingInventory || event.whoClicked !is Player) return
         if (event.slot != 0) return
         event.isCancelled = true
+        if(!event.view.cursor.isEmpty) return
         val originMatrix: Array<out ItemStack?> = (event.inventory as CraftingInventory).matrix
         if (originMatrix.firstOrNull { it?.type == Material.ENCHANTED_BOOK } == null ||
             originMatrix.firstOrNull { it?.type == Material.BOOK } == null) return
         val normalBook: ItemStack = originMatrix.filterNotNull().first { it.type == Material.BOOK }
         val enchantedBook: ItemStack = originMatrix.filterNotNull().first { it.type == Material.ENCHANTED_BOOK }
-        (event.whoClicked as Player).scheduler.run(Main.configManager.javaPlugin, {
+        (event.whoClicked as Player).scheduler.runDelayed(Main.configManager.javaPlugin, {
             if (normalBook.amount > 0) {
                 val putBook: ItemStack = normalBook.clone()
                 putBook.amount -= 1
@@ -42,7 +43,7 @@ class CraftListener : Listener {
             }
             val putEnchantedBook: ItemStack = enchantedBook.clone()
             event.inventory.setItem(originMatrix.indexOf(enchantedBook) + 1, putEnchantedBook)
-        }, null)
+        }, null,1L)
         event.view.setCursor(enchantedBook.clone())
     }
 //    @EventHandler(priority = EventPriority.MONITOR)
