@@ -1,6 +1,5 @@
 package org.luminolcraft.unlockEnchantment
 
-import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -10,7 +9,6 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.PrepareItemCraftEvent
 import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.ItemStack
-import java.util.function.Consumer
 
 class CraftListener : Listener {
     @EventHandler(priority = EventPriority.MONITOR)
@@ -30,6 +28,7 @@ class CraftListener : Listener {
     fun onCraft(event: InventoryClickEvent) {
         if (!Main.configManager.isEnchantmentSimplify || event.inventory !is CraftingInventory || event.whoClicked !is Player) return
         if (event.slot != 0) return
+        event.isCancelled = true
         val originMatrix: Array<out ItemStack?> = (event.inventory as CraftingInventory).matrix
         if (originMatrix.firstOrNull { it?.type == Material.ENCHANTED_BOOK } == null ||
             originMatrix.firstOrNull { it?.type == Material.BOOK } == null) return
@@ -42,9 +41,9 @@ class CraftListener : Listener {
                 event.inventory.setItem(originMatrix.indexOf(normalBook) + 1, putBook)
             }
             val putEnchantedBook: ItemStack = enchantedBook.clone()
-            putEnchantedBook.amount -= 1
             event.inventory.setItem(originMatrix.indexOf(enchantedBook) + 1, putEnchantedBook)
         }, null)
+        event.view.setCursor(enchantedBook.clone())
     }
 //    @EventHandler(priority = EventPriority.MONITOR)
 //    fun onCraft(event: CraftItemEvent) {
