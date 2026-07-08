@@ -11,7 +11,7 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
-class ConfigManager(val config: FileConfiguration, javaPlugin: JavaPlugin) {
+class ConfigManager(val config: FileConfiguration, val javaPlugin: JavaPlugin) {
     val configFile: File = File(javaPlugin.dataFolder, "config.yml")
 
     var isPluginEnabled: Boolean = false
@@ -20,56 +20,64 @@ class ConfigManager(val config: FileConfiguration, javaPlugin: JavaPlugin) {
     private var blacklistStr: List<String> = Lists.newArrayList()
     var blackListEnchantments: MutableList<Enchantment?> = Lists.newArrayList()
     var specialEnchantments: MutableMap<Enchantment, SpecialEnchantments> = Maps.newHashMap()
+    var expensiveEnchantMessage: String = String()
 
     private fun initConfig() {
         if (!configFile.exists()) {
             configFile.parentFile.mkdirs()
             configFile.createNewFile()
         }
-            config.load(configFile)
-            if (config.get("enabled") == null) {
-                config.set("enabled", true)
-                config.setComments("enabled", listOf("Set whether to enable the plugin's function"))
-            }
-            if (config.get("simplify-enchantment") == null) {
-                config.set("simplify-enchantment", true)
-                config.setComments("simplify-enchantment", listOf("Set whether to simplify the enchantment"))
-            }
-            if (config.get("maximum-level-cost") == null || config.getInt("maximum-level-cost") < -1) {
-                config.set("maximum-level-cost", -1)
-                config.setComments(
-                    "maximum-level-cost",
-                    listOf("Set the value of maximum level cost", "Set -1 to make the cost unlimited")
+        config.load(configFile)
+        if (config.get("enabled") == null) {
+            config.set("enabled", true)
+            config.setComments("enabled", listOf("Set whether to enable the plugin's function"))
+        }
+        if (config.get("simplify-enchantment") == null) {
+            config.set("simplify-enchantment", true)
+            config.setComments("simplify-enchantment", listOf("Set whether to simplify the enchantment"))
+        }
+        if (config.get("maximum-level-cost") == null || config.getInt("maximum-level-cost") < -1) {
+            config.set("maximum-level-cost", -1)
+            config.setComments(
+                "maximum-level-cost",
+                listOf("Set the value of maximum level cost", "Set -1 to make the cost unlimited")
+            )
+        }
+        if (config.get("blacklist") == null) {
+            config.set("blacklist", listOf(null))
+            config.setComments(
+                "blacklist", listOf(
+                    "Set which enchantment should be ignored",
+                    "making it didn't be applied in this plugin",
+                    "To check the name of each enchantment,",
+                    "See: https://jd.papermc.io/folia/26.1.2/org/bukkit/enchantments/Enchantment.html",
+                    "Example:",
+                    "blacklist:",
+                    "  - SHARPNESS"
                 )
-            }
-            if (config.get("blacklist") == null) {
-                config.set("blacklist", listOf(null))
-                config.setComments(
-                    "blacklist", listOf(
-                        "Set which enchantment should be ignored",
-                        "making it didn't be applied in this plugin",
-                        "To check the name of each enchantment,",
-                        "See: https://jd.papermc.io/folia/26.1.2/org/bukkit/enchantments/Enchantment.html",
-                        "Example:",
-                        "blacklist:",
-                        "  - SHARPNESS"
-                    )
-                )
+            )
 
-            }
-            if (config.get("special-enchantment-setting") == null) {
-                config.set("special-enchantment-setting", listOf(null))
-                config.setComments(
-                    "special-enchantment-setting", listOf(
-                        "Set which enchantment should be specially adjusted",
-                        "Example:",
-                        "special-enchantment-setting:",
-                        "  SHARPNESS:",
-                        "    maximum-level: 5"
-                    )
+        }
+        if (config.get("special-enchantment-setting") == null) {
+            config.set("special-enchantment-setting", listOf(null))
+            config.setComments(
+                "special-enchantment-setting", listOf(
+                    "Set which enchantment should be specially adjusted",
+                    "Example:",
+                    "special-enchantment-setting:",
+                    "  SHARPNESS:",
+                    "    maximum-level: 5"
                 )
-            }
-            config.save(configFile)
+            )
+        }
+        if (config.get("expensive-enchant-message") == null) {
+            config.set(
+                "expensive-enchant-message",
+                "<hover:show_item:enchanted_book></hover><RED>超出原版附魔显示，附魔所需等级为 <green><level></green>"
+            )
+            config.setComments("expensive-enchant-message",listOf("Set the message displayed when the cost level reaches to 40 and above."))
+        }
+        config.save(configFile)
 
     }
 
@@ -96,6 +104,7 @@ class ConfigManager(val config: FileConfiguration, javaPlugin: JavaPlugin) {
                 specialEnchantments[enchant] = (SpecialEnchantments(enchant, maximumLevels))
             }
         }
+        expensiveEnchantMessage = config.getString("expensive-enchant-message","<hover:show_item:enchanted_book></hover><RED>超出原版附魔显示，附魔所需等级为 <green>{level}</green>")!!
     }
 
     fun reloadConfig() {

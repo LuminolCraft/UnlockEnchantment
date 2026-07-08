@@ -11,6 +11,7 @@ class Main : JavaPlugin() {
         configManager = ConfigManager(config, this)
         configManager.loadConfig()
         Bukkit.getPluginManager().registerEvents(AnvilListener(), this)
+        Bukkit.getPluginManager().registerEvents(CraftListener(), this)
         logger.info("Loaded")
     }
 

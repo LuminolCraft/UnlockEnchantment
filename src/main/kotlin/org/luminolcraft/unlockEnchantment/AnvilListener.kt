@@ -1,5 +1,6 @@
 package org.luminolcraft.unlockEnchantment
 
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Material
 import org.bukkit.Tag
 import org.bukkit.enchantments.Enchantment
@@ -9,17 +10,17 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.PrepareAnvilEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
-import kotlin.let
 
 class AnvilListener : Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     fun onPrepareAnvil(event: PrepareAnvilEvent) {
-//        println("Event Handled")
+        event.view.maximumRepairCost = Int.MAX_VALUE
         val result: ItemStack = event.result ?: return
         val firstItem: ItemStack? = event.inventory.firstItem
         val secondItem: ItemStack? = event.inventory.secondItem
 //        println("If no more log,bugs.Stage 1")
+        if (event.inventory.secondItem == null) return
         if (firstItem!!.isEmpty || event.inventory.secondItem!!.isEmpty || !Main.configManager.isPluginEnabled) return
 //        println("If no more log,bugs.Stage 2")
 //        val firstItemEnchants: Map<Enchantment?, Int?>?
@@ -129,10 +130,20 @@ class AnvilListener : Listener {
         if (event.view.repairCost >= Main.configManager.maximumLevelCost && Main.configManager.maximumLevelCost != -1) {
             event.view.repairCost = Main.configManager.maximumLevelCost
         }
+        if (event.view.repairCost > 39) {
+            event.view.player.sendMessage(
+                MiniMessage.miniMessage().deserialize(
+                    Main.configManager.expensiveEnchantMessage.replace(
+                        "{level}",
+                        event.view.repairCost.toString(), false
+                    )
+                )
+            )
+        }
 
         for (e in itemEnchants) {
             e.let {
-                if (Main.configManager.specialEnchantments != null && Main.configManager.specialEnchantments.containsKey(
+                if (Main.configManager.specialEnchantments.containsKey(
                         it.key
                     ) ||
                     Main.configManager.specialEnchantments[it.key]?.maximumLevels?.let { it1 -> e.value!! > it1 } == true
@@ -142,6 +153,8 @@ class AnvilListener : Listener {
                 result.addUnsafeEnchantment(it.key!!, itemEnchants[it.key]!!)
             }
         }
+
+
 //        println("All functions passed.")
 
     }
