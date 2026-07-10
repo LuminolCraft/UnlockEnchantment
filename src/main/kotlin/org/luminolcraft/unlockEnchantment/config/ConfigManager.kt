@@ -159,9 +159,12 @@ class ConfigManager(val config: FileConfiguration, val javaPlugin: JavaPlugin) {
             // 当铁砧花费等级达到 40 及以上时发送给玩家的提示消息，支持 MiniMessage 格式
             config.set(
                 "expensive-enchant-message",
-                "<hover:show_item:enchanted_book></hover><RED>超出原版附魔显示，附魔所需等级为 <green><level></green>"
+                "<hover:show_item:enchanted_book></hover><RED>超出原版附魔显示，附魔所需等级为 <green>{level}</green>"
             )
-            config.setComments("expensive-enchant-message",listOf("Set the message displayed when the cost level reaches to 40 and above."))
+            config.setComments(
+                "expensive-enchant-message",
+                listOf("Set the message displayed when the cost level reaches to 40 and above.")
+            )
         }
         // 将可能新增的默认配置项写回磁盘，保证 config.yml 与插件期望一致
         config.save(configFile)
@@ -216,7 +219,10 @@ class ConfigManager(val config: FileConfiguration, val javaPlugin: JavaPlugin) {
             }
         }
         // 读取昂贵附魔提示消息（MiniMessage 格式），第二个参数为读取失败时的兜底默认值
-        expensiveEnchantMessage = config.getString("expensive-enchant-message","<hover:show_item:enchanted_book></hover><RED>超出原版附魔显示，附魔所需等级为 <green>{level}</green>")!!
+        expensiveEnchantMessage = config.getString(
+            "expensive-enchant-message",
+            "<hover:show_item:enchanted_book></hover><RED>超出原版附魔显示，附魔所需等级为 <green>{level}</green>"
+        )!!
     }
 
     /**

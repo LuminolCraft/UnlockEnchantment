@@ -77,16 +77,17 @@ class CraftListener : Listener {
         if (!Main.configManager.isEnchantmentSimplify || event.inventory !is CraftingInventory || event.whoClicked !is Player) return
         // 校验二：只处理点击结果槽(slot == 0)的情况，其他槽位点击交给原版处理。
         if (event.slot != 0) return
-        // 关键：取消原版合成逻辑。否则原版会按默认配方消耗两本书，
-        // 附魔书会被一起消耗掉，违背"附魔书保留"的业务规则。
-        event.isCancelled = true
-        // 校验三：玩家光标必须为空，否则结果物品放不下，本次合成无效。
-        if(!event.view.cursor.isEmpty) return
+
         // 取出合成矩阵的原始引用（数组下标与合成台格子一一对应，后面放回物品要用 index）
         val originMatrix: Array<out ItemStack?> = (event.inventory as CraftingInventory).matrix
         // 校验四：再次确认材料正确（防止与 onPrepareCraft 之间的竞争条件或外部修改）。
         if (originMatrix.firstOrNull { it?.type == Material.ENCHANTED_BOOK } == null ||
             originMatrix.firstOrNull { it?.type == Material.BOOK } == null) return
+        // 关键：取消原版合成逻辑。否则原版会按默认配方消耗两本书，
+        // 附魔书会被一起消耗掉，违背"附魔书保留"的业务规则。
+        event.isCancelled = true
+        // 校验三：玩家光标必须为空，否则结果物品放不下，本次合成无效。
+        if (!event.view.cursor.isEmpty) return
         // 分别取出普通书和附魔书
         val normalBook: ItemStack = originMatrix.filterNotNull().first { it.type == Material.BOOK }
         val enchantedBook: ItemStack = originMatrix.filterNotNull().first { it.type == Material.ENCHANTED_BOOK }
@@ -108,7 +109,7 @@ class CraftListener : Listener {
             // 附魔书原样克隆一份放回原格，保证数量、附魔、NBT 都不变（即"不消耗附魔书"）
             val putEnchantedBook: ItemStack = enchantedBook.clone()
             event.inventory.setItem(originMatrix.indexOf(enchantedBook) + 1, putEnchantedBook)
-        }, null,1L)
+        }, null, 1L)
         // 立即把附魔书的副本放到玩家光标上（玩家会看到"拿起了"结果物品，无需等待延迟回调）
         event.view.setCursor(enchantedBook.clone())
     }
