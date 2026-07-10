@@ -29,3 +29,17 @@ load: POSTWORLD
 # 声明本插件支持 Folia（Paper 的多线程服务端分支）
 # 设为 true 后，Folia 服务端才会允许本插件运行；需确保插件代码线程安全
 folia-supported: true
+
+commands:
+  unlockenchantment: # 命令的基本名，请不要使用奇怪的字符！
+    aliases: # 别名，方便玩家使用
+      - "ue"
+    usage: "/unlockenchantment 重载配置文件." # 用法
+    description: "重载UnlockEnchantment配置文件" # 描述
+    permission: "unlockenchantment.usage" # 需要的权限，通常不用
+    permission-message: "你没有管理员权限！" # 无权限返回的消息，通常不用
+
+
+permissions:
+  unlockenchantment.usage:
+    default: op

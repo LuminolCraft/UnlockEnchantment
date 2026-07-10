@@ -85,6 +85,8 @@ class ConfigManager(val config: FileConfiguration, val javaPlugin: JavaPlugin) {
      */
     var expensiveEnchantMessage: String = String()
 
+    var reloadMessage: String = String()
+
     /**
      * 初始化配置文件。
      *
@@ -166,6 +168,10 @@ class ConfigManager(val config: FileConfiguration, val javaPlugin: JavaPlugin) {
                 listOf("Set the message displayed when the cost level reaches to 40 and above.")
             )
         }
+        if (config.get("reload-message") == null) {
+            config.set("reload-message", "<green>重载配置文件完成.")
+            config.setComments("reload-message", listOf("Set the message displayed when reload"))
+        }
         // 将可能新增的默认配置项写回磁盘，保证 config.yml 与插件期望一致
         config.save(configFile)
 
@@ -188,7 +194,7 @@ class ConfigManager(val config: FileConfiguration, val javaPlugin: JavaPlugin) {
         initConfig()
         // 读取三个标量配置项，第二个参数为读取失败时的兜底默认值
         isPluginEnabled = config.getBoolean("enabled", true)
-        isEnchantmentSimplify = config.getBoolean("simplify-enchantment", true)
+        isEnchantmentSimplify = isPluginEnabled && config.getBoolean("simplify-enchantment", true)
         maximumLevelCost = config.getInt("maximum-level-cost", -1)
         // 读取黑名单的原始字符串列表（如 ["SHARPNESS", "PROTECTION"]）
         blacklistStr = config.getStringList("blacklist")
@@ -223,6 +229,7 @@ class ConfigManager(val config: FileConfiguration, val javaPlugin: JavaPlugin) {
             "expensive-enchant-message",
             "<hover:show_item:enchanted_book></hover><RED>超出原版附魔显示，附魔所需等级为 <green>{level}</green>"
         )!!
+        reloadMessage = config.getString("reload-message", "<green>重载配置文件完成.")!!
     }
 
     /**

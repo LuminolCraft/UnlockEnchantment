@@ -20,6 +20,7 @@ package org.luminolcraft.unlockEnchantment
 
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
+import org.luminolcraft.unlockEnchantment.command.CommandManager
 import org.luminolcraft.unlockEnchantment.config.ConfigManager
 
 
@@ -74,6 +75,8 @@ class Main : JavaPlugin() {
         // - 监听玩家在工作台/合成格中的合成事件（如 PrepareItemCraftEvent）
         // - 用于实现"附魔书 + 普通书 = 附魔书"的简化合成功能
         Bukkit.getPluginManager().registerEvents(CraftListener(), this)
+
+        Bukkit.getPluginCommand("unlockenchantment")?.setExecutor(CommandManager())
 
         // 输出 "Loaded" 日志到服务端控制台：
         // - logger 继承自 JavaPlugin，会自动带上插件名前缀（如 [UnlockEnchantment] Loaded）
