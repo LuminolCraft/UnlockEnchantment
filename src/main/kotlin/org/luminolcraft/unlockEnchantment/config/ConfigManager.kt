@@ -100,10 +100,12 @@ class ConfigManager(val config: FileConfiguration, val javaPlugin: JavaPlugin) {
      * 该方法不会读取配置值到字段，字段映射由 [loadConfig] 负责。
      */
     private fun initConfig() {
+        var shouldSave = false
         // 首次启动时配置文件可能尚未创建：先确保父目录存在，再创建空文件
         if (!configFile.exists()) {
             configFile.parentFile.mkdirs()
             configFile.createNewFile()
+            shouldSave = true
         }
         // 将磁盘上的 YAML 内容加载到内存的 FileConfiguration 对象中
         config.load(configFile)
@@ -173,7 +175,8 @@ class ConfigManager(val config: FileConfiguration, val javaPlugin: JavaPlugin) {
             config.setComments("reload-message", listOf("Set the message displayed when reload"))
         }
         // 将可能新增的默认配置项写回磁盘，保证 config.yml 与插件期望一致
-        config.save(configFile)
+
+        if (shouldSave) config.save(configFile)
 
     }
 
